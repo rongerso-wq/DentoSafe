@@ -626,6 +626,325 @@ const clinicalData = {
 };
 
 /* ═══════════════════════════════════════════════════════════════
+   CLINICAL CASES DATA
+═══════════════════════════════════════════════════════════════ */
+const clinicalCasesData = {
+  permanent: {
+    avulsion: [
+      {
+        title: "Tooth stored in milk — optimal outcome",
+        age: "9-year-old boy",
+        presentation: "UR1 avulsed during a school football match. Parent called the clinic immediately, handled the tooth by the crown, rinsed for 10 seconds and placed it in cold milk. Arrived 38 minutes after the injury.",
+        keyDecision: "Extra-oral time 38 min in milk → viable PDL. Treat as 'stored in appropriate medium' protocol — irrigate socket, replant, flexible splint 2 weeks.",
+        management: "Socket irrigated with saline. Tooth replanted with sustained digital pressure, confirmed radiographically. Flexible splint (TTS wire + composite) placed. Doxycycline prescribed. RCT initiated at day 9.",
+        outcome: "Periodontal healing confirmed at 3-month review. Tooth functional at 1-year follow-up. No signs of replacement resorption.",
+        learningPoints: [
+          "Milk is the second-best storage medium after HBSS — it is readily available and effective at preserving PDL cells.",
+          "Calling the clinic ahead allows preparation and reduces chair-time delay.",
+          "RCT should be initiated 7–10 days post-replantation — not at the emergency visit.",
+        ],
+      },
+      {
+        title: "Dry tooth wrapped in tissue — non-viable PDL",
+        age: "14-year-old girl",
+        presentation: "UR1 avulsed in a bicycle accident. Tooth wrapped in dry tissue. Arrived at the clinic 95 minutes later. Dry extra-oral time >60 min — PDL cells non-viable.",
+        keyDecision: "Dry >60 min → non-viable PDL. Replantation still indicated as a space maintainer, but patient must be counselled that replacement resorption is inevitable.",
+        management: "Necrotic PDL gently removed with gauze. Root soaked in 2.4% NaF for 20 min. Extra-oral RCT performed. Socket irrigated, tooth replanted, flexible splint for 4 weeks. Antibiotics prescribed.",
+        outcome: "Replacement resorption confirmed radiographically at 6 months. Tooth acting as space maintainer pending implant placement post-skeletal maturity.",
+        learningPoints: [
+          "Storing a tooth in dry tissue or cloth desiccates PDL cells within minutes — this is the most common avoidable error.",
+          "Replantation of non-viable teeth is still beneficial as a temporary space maintainer.",
+          "Patients must understand that ankylosis and resorption are the expected long-term outcomes.",
+        ],
+      },
+    ],
+    concussion: [
+      {
+        title: "Post-fall concussion — reassurance and monitoring",
+        age: "8-year-old girl",
+        presentation: "Fell off her scooter. UR1 tender to touch and percussion. No mobility, no displacement, no sulcular bleeding. EPT positive at baseline.",
+        keyDecision: "No repositioning or splinting required. Periapical radiograph to exclude subtle displacement or root fracture.",
+        management: "Periapical X-ray normal. Soft diet for 2 weeks. Chlorhexidine mouthrinse. Analgesics as needed. Parent reassured about excellent prognosis.",
+        outcome: "4-week EPT positive. 1-year review: no discolouration, no symptoms. Pulp vital.",
+        learningPoints: [
+          "Concussion is a clinical diagnosis — tooth in normal position, no mobility, tender to percussion only.",
+          "Pulp necrosis after isolated concussion is rare (<5%) — avoid unnecessary intervention.",
+          "Yellow-brown discolouration may appear later due to pulp canal obliteration — a benign finding, not requiring RCT.",
+        ],
+      },
+    ],
+    subluxation: [
+      {
+        title: "Grade II mobility after playground collision",
+        age: "11-year-old boy",
+        presentation: "UL1 grade II mobile after a head-on collision in the playground. Sulcular bleeding present. Tooth in normal position. EPT equivocal at the emergency visit.",
+        keyDecision: "Mobility is causing discomfort — flexible splint for patient comfort for 2 weeks is appropriate, though not mandatory per IADT guidelines.",
+        management: "Periapical X-ray: no displacement or root fracture. Flexible splint placed. Soft diet. Chlorhexidine mouthrinse. EPT repeated at 2 and 4 weeks.",
+        outcome: "Splint removed at 2 weeks, tooth firm. EPT positive at 4 and 6 months. No discolouration. Pulp vital at 1 year.",
+        learningPoints: [
+          "Splinting in subluxation is optional — indicated only when mobility causes pain or functional difficulty.",
+          "Monitor pulp status over several months; necrosis may present late, especially in closed-apex teeth.",
+          "Closed apex carries ~5% necrosis risk compared to open apex — counsel the patient accordingly.",
+        ],
+      },
+    ],
+    lateral_luxation: [
+      {
+        title: "Palatally locked incisor — urgent repositioning under LA",
+        age: "10-year-old girl",
+        presentation: "UR1 displaced palatally after a bicycle fall. Tooth rigidly locked in bone — characteristic high metallic percussion tone. Patient unable to occlude normally.",
+        keyDecision: "Closed apex + significant displacement → high necrosis risk. Reposition urgently under LA; disengage apex from bony lock before digital pressure.",
+        management: "LA administered. Apex disengaged with forceps. Crown repositioned with firm digital pressure. Confirmed radiographically. Flexible splint for 4 weeks. Soft diet.",
+        outcome: "Pulp necrosis confirmed at 6 weeks (EPT negative, grey discolouration). RCT initiated. Good periodontal healing at 1 year.",
+        learningPoints: [
+          "The high metallic ('ankylotic') percussion tone signals the apex is locked in bone — forceps disengagement is required before digital repositioning.",
+          "Closed apex carries ~50% pulp necrosis risk after lateral luxation — warn the patient at initial presentation.",
+          "RCT must be started promptly when necrosis is confirmed to prevent inflammatory root resorption.",
+        ],
+      },
+    ],
+    intrusion: [
+      {
+        title: "3mm intrusion with open apex — spontaneous re-eruption",
+        age: "7-year-old boy",
+        presentation: "UR1 appeared 3mm shorter than UL1 after falling from monkey bars. Open apex confirmed on periapical X-ray. EPT equivocal.",
+        keyDecision: "Open apex + ≤3mm intrusion → allow spontaneous re-eruption. Avoid forced repositioning. Monitor weekly.",
+        management: "Conservative management. Soft diet. Weekly monitoring for 6 weeks. Chlorhexidine mouthrinse.",
+        outcome: "Spontaneous re-eruption to normal position over 5 weeks. EPT positive at 3 months. Continued root development confirmed at 1-year X-ray.",
+        learningPoints: [
+          "Immature open-apex teeth have a strong capacity for spontaneous re-eruption — avoid forceful repositioning.",
+          "If no movement is observed within 2–3 weeks, initiate orthodontic traction.",
+          "Regular monitoring is essential — necrosis can still occur even in open-apex teeth.",
+        ],
+      },
+      {
+        title: "Severe 9mm intrusion with closed apex — surgical repositioning",
+        age: "16-year-old boy",
+        presentation: "UR1 intruded approximately 9mm after a rugby tackle. Tooth barely visible clinically. Mature closed apex confirmed on X-ray.",
+        keyDecision: "Closed apex + >7mm intrusion → surgical repositioning. Initiate RCT at 2–3 weeks to prevent inflammatory resorption.",
+        management: "Surgical repositioning under LA. Flexible splint for 6 weeks. RCT initiated at 2-week review. Antibiotics. Chlorhexidine rinse.",
+        outcome: "No inflammatory resorption at 6-month radiographic review. Tooth functional with good periodontal support at 1 year.",
+        learningPoints: [
+          "Severe intrusion (>7mm) in mature teeth requires surgical repositioning — spontaneous re-eruption will not occur.",
+          "Early RCT (2–3 weeks) is essential; delay risks irreversible inflammatory root resorption.",
+          "Pulp necrosis rate in closed-apex intrusion exceeds 96% — RCT is virtually always required.",
+        ],
+      },
+    ],
+    extrusion: [
+      {
+        title: "4mm extrusion in an open-apex tooth — successful replantation",
+        age: "12-year-old girl",
+        presentation: "UL1 appeared elongated (~4mm extrusion) and very mobile after a playground fall. Crown visible, partial root exposed. Open apex confirmed on X-ray.",
+        keyDecision: "Open apex → revascularisation possible. Reposition gently under LA. Flexible splint for 2 weeks.",
+        management: "LA administered. Tooth repositioned with sustained digital pressure. Confirmed radiographically. Flexible splint for 2 weeks. Soft diet. Chlorhexidine.",
+        outcome: "Splint removed at 2 weeks. EPT positive at 6 and 12 months. Continued root development confirmed at 1-year X-ray.",
+        learningPoints: [
+          "Open-apex extruded teeth have a good chance of pulp revascularisation — avoid premature RCT.",
+          "Prognosis worsens with increasing extrusion distance and mobility grade.",
+          "Always confirm repositioning radiographically before placing the splint.",
+        ],
+      },
+    ],
+    crown_fracture_uncomplicated: [
+      {
+        title: "Enamel-dentine fracture — fragment reattachment",
+        age: "9-year-old boy",
+        presentation: "Mesio-incisal corner of UR1 fractured after a fall on stairs. No pulp exposure. Parent retrieved the fragment and stored it in water.",
+        keyDecision: "Fragment available and fitting well → reattach with composite. Apply liner over exposed dentine before bonding.",
+        management: "Fragment assessed: intact and fitting accurately. Calcium hydroxide liner applied to exposed dentine. Fragment reattached with composite. Periapical X-ray normal.",
+        outcome: "Excellent aesthetics. EPT positive at 6 and 12 months. No periapical changes on X-ray at 1 year.",
+        learningPoints: [
+          "Fragment reattachment is the preferred restoration when available — superior aesthetics with minimal tooth reduction.",
+          "Always apply a dentine-bonding liner under composite when dentine is exposed.",
+          "Advise parents in advance to store fragments in milk or water if found at the scene.",
+        ],
+      },
+    ],
+    crown_fracture_complicated: [
+      {
+        title: "Pulp exposure in an immature tooth — partial pulpotomy (Biodentine)",
+        age: "10-year-old boy",
+        presentation: "UL1 fractured with ~2mm pulp exposure after a bicycle fall. Seen 4 hours after injury. Healthy bleeding pulp. Open apex with good root length on X-ray.",
+        keyDecision: "Open apex + <48 hours + healthy pulp → partial pulpotomy with Biodentine®. Goal: apexogenesis — preserve continued root development.",
+        management: "Local anaesthesia. Partial pulpotomy (2mm depth). Biodentine® placed over pulp stump. Composite restoration placed over the Biodentine.",
+        outcome: "6-month X-ray: continued root development, no periapical changes. 1-year review: hard tissue bridge confirmed radiographically. Pulp vital.",
+        learningPoints: [
+          "Partial pulpotomy (MTA or Biodentine) in open-apex teeth preserves root development — always preferred over RCT in immature teeth.",
+          "Timing and pulp health are the key prognostic factors — <48 hours with healthy bleeding pulp gives excellent results.",
+          "Full RCT in an immature tooth sacrifices apexogenesis — avoid unless pulpotomy has clearly failed.",
+        ],
+      },
+    ],
+    root_fracture: [
+      {
+        title: "Middle-third root fracture — healing with calcified callus",
+        age: "13-year-old girl",
+        presentation: "UR1 mildly mobile and tender after a sports impact. Angled periapical X-ray confirmed a horizontal root fracture at the middle third. Coronal fragment not displaced.",
+        keyDecision: "Middle-third fracture, non-displaced coronal segment → flexible splint for 4 weeks. Monitor coronal fragment for necrosis.",
+        management: "No LA required (no displacement). Flexible splint for 4 weeks. Soft diet. Chlorhexidine mouthrinse.",
+        outcome: "4-month X-ray: healing with interproximal calcified callus. Coronal pulp EPT positive. No symptoms at 1-year review.",
+        learningPoints: [
+          "Root fractures can heal by calcified callus, connective tissue, or granulation tissue — all are acceptable outcomes.",
+          "Only the coronal fragment pulp may become necrotic — the apical fragment's pulp usually remains vital.",
+          "Eccentric (angled) periapical X-rays are essential — fractures are frequently missed on standard views alone.",
+        ],
+      },
+    ],
+    alveolar_fracture: [
+      {
+        title: "Alveolar segment fracture involving two incisors",
+        age: "17-year-old boy",
+        presentation: "UR1 and UR2 mobile as a rigid unit with a visible step deformity in the alveolar bone following a collision. Lip lacerations present. CBCT confirmed extent of fracture.",
+        keyDecision: "Reposition the alveolar segment AND teeth together as one unit. Semi-rigid splint for 4 weeks. Suture lacerations. Monitor all involved teeth individually for pulp necrosis.",
+        management: "LA administered. Segment repositioned under digital pressure, confirmed radiographically. Semi-rigid splint from UR3 to UL2. Lacerations sutured. Antibiotics. Chlorhexidine.",
+        outcome: "Splint removed at 4 weeks: good bone healing on X-ray. UR1 developed necrosis at 6 weeks → RCT initiated. UR2 remained vital at 1 year.",
+        learningPoints: [
+          "The alveolar segment and teeth must always be moved as a single unit — independent tooth repositioning risks fracturing bone.",
+          "Not all involved teeth will develop necrosis — each requires individual pulp monitoring at every visit.",
+          "CBCT provides superior fracture assessment compared to conventional radiography for complex cases.",
+        ],
+      },
+    ],
+  },
+  primary: {
+    avulsion: [
+      {
+        title: "Primary incisor avulsion — do NOT replant",
+        age: "2.5-year-old girl",
+        presentation: "Upper left primary central incisor avulsed after falling from a coffee table. Parent arrived holding the tooth, asking whether to put it back.",
+        keyDecision: "Primary tooth avulsion — replantation CONTRAINDICATED. First confirm with X-ray that it is truly avulsed and not intruded.",
+        management: "Periapical X-ray confirmed avulsion. Bleeding controlled with gauze. Parent counselled not to replant. Space maintainer not indicated for anterior primary teeth.",
+        outcome: "Gum healed within 2 weeks. 1-year X-ray: permanent successor developing normally. Permanent tooth erupted at age 7 without disturbance.",
+        learningPoints: [
+          "NEVER replant a primary tooth — the risk of damaging the permanent successor outweighs any benefit.",
+          "Always take an X-ray to exclude intrusion, which can clinically mimic avulsion.",
+          "Space maintenance for avulsed primary anterior teeth is not routinely required.",
+        ],
+      },
+    ],
+    concussion: [
+      {
+        title: "Primary incisor concussion in a toddler — reassurance",
+        age: "3-year-old boy",
+        presentation: "Upper right primary central incisor tender to touch and percussion after bumping head on a table edge. Tooth in normal position, no mobility, no discolouration.",
+        keyDecision: "No active treatment required. Periapical X-ray to exclude subtle displacement. Parent education on warning signs.",
+        management: "Periapical X-ray normal. Soft diet for 1 week. Parent instructed to watch for grey discolouration, swelling, or a gum pimple.",
+        outcome: "6-week review: normal colour, no fistula. Tooth exfoliated normally at age 5.",
+        learningPoints: [
+          "Primary tooth concussion requires no treatment — reassure the parent clearly.",
+          "Educate parents on warning signs of necrosis: grey discolouration, swelling, or sinus tract (gum pimple).",
+          "Immediate grey discolouration is usually haemorrhagic and may resolve; delayed grey discolouration is more concerning for necrosis.",
+        ],
+      },
+    ],
+    subluxation: [
+      {
+        title: "Primary subluxation — spontaneous resolution",
+        age: "4-year-old girl",
+        presentation: "Upper left primary lateral incisor grade I mobile after a playground fall. Sulcular bleeding present. Tooth in normal position. Child uncooperative.",
+        keyDecision: "Brief, targeted examination. No displacement on X-ray → conservative management. Spontaneous resolution expected.",
+        management: "Soft diet for 2 weeks. Chlorhexidine applied with cotton bud to gingival area. Parent instructed to monitor. No splinting.",
+        outcome: "1-week review: mobility back to normal. 6-week review: tooth firm, no discolouration. Permanent successor normal on 1-year X-ray.",
+        learningPoints: [
+          "Primary subluxation almost always resolves spontaneously — splinting is rarely needed.",
+          "Keep the examination brief and involve the parent to manage the young child's anxiety.",
+          "Always check the permanent successor at the 1-year follow-up for developmental disturbance.",
+        ],
+      },
+    ],
+    lateral_luxation: [
+      {
+        title: "Palatally displaced primary incisor — immediate extraction",
+        age: "2-year-old boy",
+        presentation: "Upper right primary central incisor displaced palatally after a tumble at home. X-ray showed the apex directed toward the permanent tooth germ.",
+        keyDecision: "Palatal displacement toward permanent successor → EXTRACT IMMEDIATELY. Risk of developmental disturbance to permanent tooth is too high.",
+        management: "Topical anaesthesia + infiltration. Atraumatic extraction. Parent counselled about the gap and monitoring of the successor.",
+        outcome: "6-month review: gum healed well. 1-year X-ray: permanent successor developing normally, no enamel defects or positional change.",
+        learningPoints: [
+          "The critical question: is the apex displaced toward the successor? If yes — extract immediately.",
+          "Labially displaced teeth (away from successor) with undisturbed occlusion may be observed for spontaneous repositioning.",
+          "Early extraction, though distressing for the parent, is the safest intervention when the successor is at risk.",
+        ],
+      },
+    ],
+    intrusion: [
+      {
+        title: "Labially intruded primary incisor — conservative management",
+        age: "18-month-old girl",
+        presentation: "Upper right primary central incisor not visible after a walking fall. X-ray confirmed intrusion with apex displaced labially — away from the permanent tooth germ.",
+        keyDecision: "Labial displacement (away from successor) → conservative management. Allow spontaneous re-eruption. Monitor every 2–3 weeks.",
+        management: "Parent reassured and educated. Soft diet. Monitoring visits every 2–3 weeks.",
+        outcome: "Re-eruption began at 3 weeks. Tooth fully re-erupted by 8 weeks. Permanent successor developed normally.",
+        learningPoints: [
+          "X-ray in two planes is essential to determine the direction of the intruded apex.",
+          "Labial intrusion (apex away from successor): conservative management is safe.",
+          "Palatal intrusion (apex toward successor): extract immediately — do not observe.",
+        ],
+      },
+      {
+        title: "Palatally intruded primary incisor → extraction, Turner's tooth sequela",
+        age: "2-year-old boy",
+        presentation: "Upper left primary central incisor intruded after a high fall. X-ray showed the apex displaced palatally, toward the permanent tooth germ.",
+        keyDecision: "Palatal intrusion → EXTRACT IMMEDIATELY. Even prompt extraction may not fully prevent successor disturbance.",
+        management: "Emergency extraction under local anaesthesia. Parent counselled about risk of permanent tooth involvement.",
+        outcome: "At age 6: white/brown spot enamel defect (Turner's tooth — localised enamel hypoplasia) on the permanent upper left central incisor. No functional impairment.",
+        learningPoints: [
+          "Prompt extraction minimises but does not always eliminate successor disturbance.",
+          "Turner's tooth (localised enamel hypoplasia) is a recognised sequela of primary tooth trauma.",
+          "Always inform parents at the emergency visit about the potential for permanent tooth involvement.",
+        ],
+      },
+    ],
+    extrusion: [
+      {
+        title: "Severely extruded primary incisor — extraction for safety",
+        age: "3-year-old boy",
+        presentation: "Upper right primary central incisor extruded ~5mm and barely attached after a bicycle fall. Child distressed. Aspiration risk assessed as significant.",
+        keyDecision: "Severe extrusion with aspiration risk in a young child → EXTRACT. Child safety takes priority over tooth preservation.",
+        management: "Topical anaesthesia applied. Atraumatic extraction with gentle forceps. Socket compressed. Parent reassured.",
+        outcome: "Healed within 2 weeks. No space maintenance required. Permanent successor erupted normally at age 7.",
+        learningPoints: [
+          "Aspiration risk is the dominant consideration in severely extruded primary teeth — extraction is preferred over repositioning.",
+          "Minor extrusions (<3mm, tooth stable) may be monitored conservatively with soft diet.",
+          "Clear, calm communication with the parent before extraction reduces child and parent anxiety.",
+        ],
+      },
+    ],
+    crown_fracture_uncomplicated: [
+      {
+        title: "Enamel-dentine fracture — smoothing and monitoring",
+        age: "4-year-old girl",
+        presentation: "Mesial corner of upper left primary lateral incisor chipped after a nursery fall. No pulp exposure. Sharp edge present. No sensitivity reported.",
+        keyDecision: "No pulp exposure, no sensitivity, sharp edge → smooth enamel with disc. Composite if dentine is sensitive.",
+        management: "Sharp enamel edge smoothed. Fragment not recovered. Fluoride varnish applied. Parent shown proper hygiene technique around the area.",
+        outcome: "6-week review: no discolouration or swelling. Tooth exfoliated normally at age 5.",
+        learningPoints: [
+          "Smoothing sharp enamel edges at the emergency visit prevents tongue/lip laceration — a quick, effective intervention.",
+          "Enamel-only fractures in primary teeth can often be managed with smoothing alone.",
+          "Composite restoration is indicated if dentine is exposed and causing sensitivity.",
+        ],
+      },
+    ],
+    crown_fracture_complicated: [
+      {
+        title: "Primary incisor pulp exposure — pulpotomy decision",
+        age: "3.5-year-old boy",
+        presentation: "Upper right primary lateral incisor fractured with clear pulp exposure after falling against a toy. X-ray: root resorption <⅓, periapex normal. Child moderately cooperative.",
+        keyDecision: "Root resorption <⅓, cooperative child, adequate crown structure → pulpotomy is appropriate. Extract if any doubt about cooperation or remaining tooth structure.",
+        management: "Local anaesthesia. Pulpotomy performed with ZOE. Stainless steel crown placed same visit.",
+        outcome: "6-month review: no periapical pathology, no sinus tract. Root resorption progressing physiologically. Tooth exfoliated normally at age 5.5.",
+        learningPoints: [
+          "Pulpotomy is reasonable in primary teeth with minimal resorption and a cooperative patient.",
+          "Stainless steel crown provides superior longevity over composite for primary teeth with significant coronal loss.",
+          "Extract if: root resorption >⅓, uncooperative child, inadequate structure, or any periapical pathology.",
+        ],
+      },
+    ],
+  },
+};
+
+/* ═══════════════════════════════════════════════════════════════
    UTILITIES
 ═══════════════════════════════════════════════════════════════ */
 function parseFollowUpDays(text) {
@@ -1056,9 +1375,61 @@ function ParentProtocolPanel({ injury, injuryKey, onBack }) {
 }
 
 /* ═══════════════════════════════════════════════════════════════
+   CLINICAL CASE CARD
+═══════════════════════════════════════════════════════════════ */
+function ClinicalCaseCard({ c, index }) {
+  const [open, setOpen] = React.useState(false);
+  return (
+    <div className="rounded-xl border border-medical-200 overflow-hidden">
+      <button
+        onClick={() => setOpen(!open)}
+        className="w-full text-left px-4 py-3 flex items-center justify-between bg-medical-50 hover:bg-medical-100 transition-colors"
+      >
+        <div>
+          <span className="text-xs font-bold text-medical-400 uppercase tracking-wider">Case {index + 1} · {c.age}</span>
+          <div className="font-semibold text-medical-900 text-sm mt-0.5">{c.title}</div>
+        </div>
+        <span className="text-medical-400 text-base ml-3 flex-shrink-0">{open ? '▲' : '▼'}</span>
+      </button>
+      {open && (
+        <div className="p-4 space-y-3 text-sm fade-in border-t border-medical-100">
+          <div>
+            <span className="font-semibold text-medical-700">Presentation: </span>
+            <span className="text-medical-800">{c.presentation}</span>
+          </div>
+          <div>
+            <span className="font-semibold text-medical-700">Key Decision: </span>
+            <span className="text-medical-800">{c.keyDecision}</span>
+          </div>
+          <div>
+            <span className="font-semibold text-medical-700">Management: </span>
+            <span className="text-medical-800">{c.management}</span>
+          </div>
+          <div>
+            <span className="font-semibold text-medical-700">Outcome: </span>
+            <span className="text-medical-800">{c.outcome}</span>
+          </div>
+          <div className="pt-1">
+            <div className="text-xs font-bold text-medical-600 uppercase tracking-wider mb-2">Learning Points</div>
+            <ul className="space-y-1.5">
+              {c.learningPoints.map((lp, i) => (
+                <li key={i} className="flex gap-2 text-xs text-medical-700">
+                  <span className="text-medical-400 flex-shrink-0 mt-0.5">→</span>
+                  <span>{lp}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════
    CLINICAL PROTOCOL PANEL  (dentist mode — improvement #4 + #5)
 ═══════════════════════════════════════════════════════════════ */
-function ProtocolPanel({ injury, injuryKey, onBack }) {
+function ProtocolPanel({ injury, injuryKey, toothType, onBack }) {
   const [tab, setTab] = React.useState('treatment');
   const cfg = severityConfig[injury.severity] || severityConfig.low;
   const isAvulsion = !!injury.extraoralTime;
@@ -1110,7 +1481,7 @@ function ProtocolPanel({ injury, injuryKey, onBack }) {
 
       {/* Tabs */}
       <div className="flex border-b border-medical-100 bg-medical-50 px-4 no-print">
-        {['treatment','splinting','followup'].map(t => (
+        {['treatment','splinting','followup','cases'].map(t => (
           <button
             key={t}
             onClick={() => setTab(t)}
@@ -1118,7 +1489,7 @@ function ProtocolPanel({ injury, injuryKey, onBack }) {
               tab === t ? 'border-medical-500 text-medical-700' : 'border-transparent text-medical-400 hover:text-medical-600'
             }`}
           >
-            {t === 'followup' ? 'Follow-up' : t.charAt(0).toUpperCase() + t.slice(1)}
+            {t === 'followup' ? 'Follow-up' : t === 'cases' ? '📋 Cases' : t.charAt(0).toUpperCase() + t.slice(1)}
           </button>
         ))}
       </div>
@@ -1214,6 +1585,26 @@ function ProtocolPanel({ injury, injuryKey, onBack }) {
           </div>
         )}
 
+        {/* CASES TAB */}
+        {tab === 'cases' && (() => {
+          const cases = (clinicalCasesData[toothType] || {})[injuryKey] || [];
+          return (
+            <div className="fade-in">
+              <h3 className="text-xs font-semibold text-medical-700 mb-3 uppercase tracking-wider">Clinical Cases</h3>
+              {cases.length > 0 ? (
+                <div className="space-y-3">
+                  {cases.map((c, i) => (
+                    <ClinicalCaseCard key={i} c={c} index={i} />
+                  ))}
+                </div>
+              ) : (
+                <div className="text-sm text-medical-400 text-center py-8">No cases available for this injury type yet.</div>
+              )}
+              <p className="text-xs text-medical-300 text-center mt-4">Cases are illustrative examples based on IADT 2020 guidelines. Always apply clinical judgement.</p>
+            </div>
+          );
+        })()}
+
       </div>
     </div>
   );
@@ -1294,7 +1685,7 @@ function App() {
             </div>
             {isParent
               ? <ParentProtocolPanel injury={injuries[selectedInjury]} injuryKey={selectedInjury} onBack={() => setSelectedInjury(null)} />
-              : <ProtocolPanel       injury={injuries[selectedInjury]} injuryKey={selectedInjury} onBack={() => setSelectedInjury(null)} />
+              : <ProtocolPanel       injury={injuries[selectedInjury]} injuryKey={selectedInjury} toothType={toothType} onBack={() => setSelectedInjury(null)} />
             }
           </section>
         )}
