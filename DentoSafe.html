@@ -1,0 +1,1324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DentoSafe – Dental Trauma Guide</title>
+  <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            medical: {
+              50:'#EFF6FF',100:'#DBEAFE',200:'#BFDBFE',300:'#93C5FD',
+              400:'#60A5FA',500:'#3B82F6',600:'#2563EB',700:'#1D4ED8',
+              800:'#1E40AF',900:'#1E3A8A',
+            },
+            emergency: '#DC2626',
+          },
+          fontFamily: { sans: ['Inter','system-ui','sans-serif'] },
+        },
+      },
+    };
+  </script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    body { background-color: #F0F5FF; font-family: 'Inter', sans-serif; }
+    .card-hover { transition: all 0.2s ease; }
+    .card-hover:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(37,99,235,0.15); }
+    .fade-in { animation: fadeIn 0.35s ease; }
+    @keyframes fadeIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+    .emergency-pulse { animation: epulse 2s infinite; }
+    @keyframes epulse { 0%,100% { box-shadow:0 0 0 0 rgba(220,38,38,0.4); } 70% { box-shadow:0 0 0 10px rgba(220,38,38,0); } }
+    .badge { display:inline-flex; align-items:center; border-radius:9999px; font-size:0.7rem; font-weight:600; padding:2px 10px; }
+    @media print {
+      .no-print { display:none !important; }
+      body { background:white !important; }
+      .print-card { border:1px solid #ccc !important; box-shadow:none !important; }
+    }
+  </style>
+</head>
+<body>
+<div id="root"></div>
+
+<script type="text/babel">
+
+/* ═══════════════════════════════════════════════════════════════
+   CLINICAL DATA  —  IADT 2020 Guidelines
+   Each injury has:
+     immediateActions  — clinician protocol (dentist mode)
+     parentActions     — plain-language first-aid (parent mode)  ← NEW
+═══════════════════════════════════════════════════════════════ */
+const clinicalData = {
+  permanent: {
+    avulsion: {
+      label: "Avulsion", icon: "🦷", severity: "critical",
+      description: "Complete displacement of tooth from its socket. TIME IS CRITICAL — PDL viability determines prognosis.",
+      immediateActions: [
+        "CALL AHEAD to the clinic — time is the single most important factor.",
+        "Handle tooth by the crown ONLY — never touch the root surface.",
+        "If contaminated: rinse gently under cold running water for max 10 seconds. Do NOT scrub.",
+        "If cooperative patient: REPLANT IMMEDIATELY. Bite on gauze to hold in place.",
+        "If unable to replant: store in HBSS (Hank's) > cold milk > saline > under patient's tongue.",
+        "Do NOT store in water. Do NOT wrap in tissue or cloth.",
+        "Verify tetanus immunisation status on arrival.",
+      ],
+      parentActions: [
+        "Pick up the tooth by the white part (crown) — NEVER touch the root.",
+        "If dirty: rinse gently under cold tap water for 10 seconds only. Do NOT scrub or dry it.",
+        "Try to put the tooth back in the hole it came from. Bite gently on a clean cloth to hold it.",
+        "If you can't put it back: place tooth in cold milk, or under the child's tongue (adults only).",
+        "Do NOT wrap tooth in tissue. Do NOT store in plain water.",
+        "Go to a dentist or emergency room RIGHT NOW — every minute matters.",
+      ],
+      extraoralTime: {
+        dryLessThan60: {
+          label: "Dry < 60 min (viable PDL)",
+          protocol: [
+            "Irrigate socket gently with saline to remove coagulum — do NOT curettage.",
+            "Examine socket for alveolar fracture; reposition if needed.",
+            "Replant tooth with gentle, sustained digital pressure; verify with periapical radiograph.",
+            "Apply flexible splint (0.4 mm wire + composite) for 2 weeks.",
+            "Systemic antibiotics: Doxycycline 100 mg × 2/day × 7 days (adults). Children < 12 yrs: Penicillin V or amoxicillin.",
+            "Chlorhexidine 0.1% mouthrinse × 2/day for 1–2 weeks.",
+            "Soft diet for 2 weeks.",
+            "Initiate root canal treatment 7–10 days after replantation (before splint removal).",
+          ],
+        },
+        dryMoreThan60: {
+          label: "Dry > 60 min (non-viable PDL)",
+          protocol: [
+            "PDL cells are non-viable; inflammatory replacement resorption is expected.",
+            "Remove necrotic PDL remnants from root surface gently with gauze.",
+            "Soak root in 2.4% sodium fluoride solution for 20 minutes.",
+            "Perform root canal treatment extra-orally OR plan intracanal treatment after replantation.",
+            "Irrigate socket with saline; replant tooth with gentle pressure.",
+            "Flexible splint for 4 weeks.",
+            "Systemic antibiotics (same regimen as above).",
+            "INFORM patient/parent: ankylosis and replacement resorption are expected; tooth acts as space maintainer.",
+          ],
+        },
+        storedMedium: {
+          label: "Stored in appropriate medium (HBSS / milk / saliva)",
+          protocol: [
+            "Viable PDL cells are likely preserved — treat as Dry < 60 min protocol.",
+            "Irrigate socket gently with saline; remove coagulum without curetting.",
+            "Replant with gentle sustained pressure; confirm position radiographically.",
+            "Flexible splint for 2 weeks.",
+            "Systemic antibiotics: Doxycycline 100 mg × 2/day × 7 days (adults); Penicillin V / amoxicillin for children.",
+            "Chlorhexidine 0.1% mouthrinse × 2/day for 1–2 weeks.",
+            "Initiate root canal treatment 7–10 days post-replantation.",
+          ],
+        },
+      },
+      splinting: "Flexible splint (0.4 mm TTS wire + composite) — 2 weeks viable PDL; 4 weeks non-viable PDL",
+      followUp: [
+        "7–10 days — root canal treatment; splint check",
+        "2 weeks — splint removal (viable PDL); assess healing",
+        "4 weeks — clinical & radiographic review",
+        "3 months — pulp & periodontal status",
+        "6 months — radiographic review",
+        "1 year — clinical & radiographic review",
+        "Yearly for 5 years — long-term monitoring",
+      ],
+      prognosis: "Depends critically on extra-oral dry time and storage medium. Replantation within 60 min in appropriate medium offers best chance of PDL healing. Non-viable PDL: replacement resorption inevitable.",
+    },
+
+    concussion: {
+      label: "Concussion", icon: "💥", severity: "low",
+      description: "Injury to tooth-supporting structures with NO abnormal loosening or displacement. Tender to touch and percussion only.",
+      immediateActions: [
+        "No repositioning required — tooth is in normal position.",
+        "Periapical radiograph to exclude root fracture or subtle displacement.",
+        "Soft diet for 1–2 weeks; avoid biting on injured tooth.",
+        "Chlorhexidine 0.1% mouthrinse × 2/day for 1–2 weeks.",
+        "Analgesics (ibuprofen / paracetamol) as needed.",
+        "Reassure patient: prognosis is excellent.",
+      ],
+      parentActions: [
+        "The tooth is sore but in its normal position — do NOT try to move it.",
+        "Give soft foods only for 1–2 weeks (no hard biting or chewing on that side).",
+        "Rinse gently with warm water after meals. Keep mouth clean.",
+        "Paracetamol or ibuprofen for pain (age-appropriate dose).",
+        "See a dentist within 24–48 hours for an X-ray check.",
+      ],
+      splinting: "Not indicated",
+      followUp: [
+        "4 weeks — pulp sensitivity testing",
+        "6–8 weeks — clinical & radiographic review",
+        "1 year — final pulp status assessment",
+      ],
+      prognosis: "Excellent. Pulp necrosis is rare. Yellow-brown discolouration = pulp canal obliteration (benign). Grey discolouration may indicate necrosis.",
+    },
+
+    subluxation: {
+      label: "Subluxation", icon: "〰️", severity: "low",
+      description: "Injury to tooth-supporting structures with abnormal loosening but NO displacement. Sulcular bleeding may be present.",
+      immediateActions: [
+        "Periapical radiograph to exclude displacement or root fracture.",
+        "If mobility is distressing: apply flexible splint for 2 weeks.",
+        "Soft diet for 2 weeks.",
+        "Chlorhexidine 0.1% mouthrinse × 2/day for 1–2 weeks.",
+        "Analgesics as needed.",
+        "Monitor pulp vitality — necrosis possible, especially with closed apex.",
+      ],
+      parentActions: [
+        "The tooth is loose but still in position — do NOT remove it or wiggle it.",
+        "Avoid touching the tooth. Soft foods only for 2 weeks — no hard biting.",
+        "The tooth may tighten up on its own.",
+        "See a dentist today or tomorrow — they may put a thin wire to stabilise it.",
+        "If the tooth turns grey or a pimple appears on the gum — return to dentist immediately.",
+      ],
+      splinting: "Flexible splint — 2 weeks (if mobility is uncomfortable; not mandatory)",
+      followUp: [
+        "2 weeks — pulp sensitivity test; splint removal if applied",
+        "4 weeks — pulp sensitivity & mobility check",
+        "6–8 weeks — clinical & radiographic review",
+        "6 months — pulp status",
+        "1 year — final assessment",
+      ],
+      prognosis: "Good. Pulp survival is common with open apex. Closed apex: ~5% necrosis risk. Pulp canal obliteration may occur.",
+    },
+
+    lateral_luxation: {
+      label: "Lateral Luxation", icon: "↔️", severity: "high",
+      description: "Tooth displaced laterally or palatally with associated alveolar socket wall fracture. High metallic percussion sound (locked in bone).",
+      immediateActions: [
+        "Periapical AND occlusal radiographs to assess displacement and bone fracture.",
+        "Administer local anaesthesia.",
+        "Reposition: disengage apex from bony lock with forceps if needed, then firm digital pressure.",
+        "Verify correct position clinically and radiographically.",
+        "Apply flexible splint for 4 weeks.",
+        "Chlorhexidine 0.1% mouthrinse × 2/day for 1–2 weeks.",
+        "Soft diet for 4 weeks.",
+        "Monitor pulp vitality — closed apex: high necrosis risk; open apex: may revascularise.",
+        "Initiate RCT if signs of pulp necrosis or inflammatory root resorption develop.",
+      ],
+      parentActions: [
+        "The tooth has been pushed sideways — do NOT try to move it back yourself.",
+        "Go to a dentist IMMEDIATELY — same day, within hours.",
+        "The dentist will use local anaesthetic and reposition the tooth properly.",
+        "Give soft foods only. Do not chew on that side.",
+        "If you cannot reach a dentist, go to a hospital emergency department.",
+      ],
+      splinting: "Flexible splint (0.4 mm wire + composite) — 4 weeks",
+      followUp: [
+        "2 weeks — pulp sensitivity; splint check",
+        "4 weeks — splint removal; clinical & radiographic review",
+        "6–8 weeks — pulp status assessment",
+        "6 months — radiographic review for root resorption",
+        "1 year — final clinical & radiographic assessment",
+      ],
+      prognosis: "Favorable if repositioned promptly. Closed apex: ~50% pulp necrosis risk. Open apex: revascularisation likely. Monitor for inflammatory root resorption.",
+    },
+
+    intrusion: {
+      label: "Intrusion", icon: "⬇️", severity: "high",
+      description: "Apical displacement into alveolar bone. Highest risk of pulp necrosis and inflammatory root resorption. Tooth appears shortened.",
+      immediateActions: [
+        "Periapical radiograph to confirm intrusion depth and apex status.",
+        "DO NOT attempt immediate forceful repositioning.",
+        "▸ Immature apex (any depth): Allow spontaneous re-eruption; monitor weekly.",
+        "▸ Mature apex, < 3 mm: Allow spontaneous re-eruption — if no movement in 2–3 weeks, initiate orthodontic traction.",
+        "▸ Mature apex, 3–7 mm: Orthodontic repositioning preferred; surgical acceptable.",
+        "▸ Mature apex, > 7 mm: Surgical repositioning.",
+        "Mature apex: Start RCT 2–3 weeks after injury (before inflammatory resorption establishes).",
+        "Chlorhexidine 0.1% mouthrinse × 2/day.",
+      ],
+      parentActions: [
+        "The tooth looks shorter than usual or seems to have disappeared into the gum — this is a dental emergency.",
+        "Do NOT try to pull the tooth down or touch it.",
+        "Go to a dentist TODAY — within hours, not days.",
+        "The dentist needs to take an X-ray and decide on repositioning.",
+        "If you cannot reach a dentist, go to a hospital emergency department.",
+      ],
+      splinting: "Flexible splint for 4–8 weeks after repositioning; no splint during spontaneous re-eruption",
+      followUp: [
+        "2 weeks — pulp status; check for spontaneous re-eruption",
+        "4 weeks — clinical & radiographic review",
+        "6–8 weeks — root resorption monitoring",
+        "6 months — radiographic review",
+        "1 year — clinical & radiographic assessment",
+        "5 years — long-term root resorption monitoring",
+      ],
+      prognosis: "Guarded. Pulp necrosis rate very high for closed apex (>96%). Open apex: some revascularisation possible. Early RCT is essential for mature teeth.",
+    },
+
+    extrusion: {
+      label: "Extrusion", icon: "⬆️", severity: "moderate",
+      description: "Partial displacement of tooth axially out of socket. Tooth appears elongated and is mobile.",
+      immediateActions: [
+        "Periapical radiograph to assess displacement and exclude root fracture.",
+        "Administer local anaesthesia.",
+        "Reposition tooth gently with sustained digital pressure into its original position.",
+        "Confirm with periapical radiograph.",
+        "Apply flexible splint for 2 weeks.",
+        "Chlorhexidine 0.1% mouthrinse × 2/day for 1–2 weeks.",
+        "Soft diet for 2 weeks.",
+        "Monitor pulp vitality — closed apex: higher necrosis risk; open apex: may revascularise.",
+      ],
+      parentActions: [
+        "The tooth looks longer than the others and is loose — do NOT pull it out.",
+        "Go to a dentist TODAY — same day, within a few hours.",
+        "Do NOT wiggle or press on the tooth.",
+        "Soft foods only until seen by dentist.",
+        "If there is significant bleeding from the gum, apply gentle pressure with a clean cloth.",
+      ],
+      splinting: "Flexible splint (0.4 mm wire + composite) — 2 weeks",
+      followUp: [
+        "2 weeks — splint removal; pulp sensitivity test",
+        "4 weeks — clinical & radiographic review",
+        "6–8 weeks — pulp status",
+        "6 months — radiographic review",
+        "1 year — final assessment",
+      ],
+      prognosis: "Favorable if treated promptly. Pulp necrosis risk correlates with extrusion distance and apex development. Open apex: revascularisation possible.",
+    },
+
+    crown_fracture_uncomplicated: {
+      label: "Crown Fracture (Uncomplicated)", icon: "🔸", severity: "low",
+      description: "Fracture of enamel only OR enamel and dentine WITHOUT pulp exposure.",
+      immediateActions: [
+        "Periapical radiograph to exclude root fracture and assess apex development.",
+        "Search for and radiograph soft tissues for embedded fragments.",
+        "If fractured fragment available and intact: reattach with composite resin (preferred).",
+        "If no fragment: restore with composite resin.",
+        "If dentine exposure: apply calcium hydroxide or glass ionomer liner under composite.",
+        "No splinting required unless concurrent luxation injury.",
+      ],
+      parentActions: [
+        "Part of the tooth has chipped — there is no bleeding from the centre of the tooth.",
+        "Find and save the broken piece if you can (keep it in milk or water).",
+        "Cover any sharp edges with dental wax or sugar-free chewing gum to protect the tongue/lip.",
+        "See a dentist within 1–2 days — this is not an emergency but don't leave it too long.",
+        "If the child complains of sensitivity to cold/hot: protect the area and see a dentist sooner.",
+      ],
+      splinting: "Not required (unless concurrent luxation — then follow luxation splinting protocol)",
+      followUp: [
+        "6–8 weeks — pulp sensitivity test; radiographic review",
+        "1 year — final pulp status; radiographic assessment",
+      ],
+      prognosis: "Excellent. Pulp necrosis is rare. Risk slightly increased if concurrent luxation injury.",
+    },
+
+    crown_fracture_complicated: {
+      label: "Crown Fracture (Complicated)", icon: "🔴", severity: "high",
+      description: "Fracture of enamel and dentine WITH pulp exposure. Pink/red dot or bleeding visible at fracture site.",
+      immediateActions: [
+        "Periapical radiograph to assess apex status and exclude root fracture.",
+        "Determine: (1) time since injury; (2) apex development (open vs closed).",
+        "▸ OPEN APEX — any time: Partial pulpotomy (Biodentine® or MTA). Cover with restoration.",
+        "▸ CLOSED APEX, < 48 hours: Partial pulpotomy; if too deep, full pulpotomy.",
+        "▸ CLOSED APEX, > 48 hours: Cervical pulpotomy or full RCT.",
+        "After pulp treatment: restore with composite resin (reattach fragment if available).",
+        "Local anaesthesia required.",
+      ],
+      parentActions: [
+        "The tooth has broken and you can see a red or pink dot — or bleeding — in the centre. The nerve is exposed.",
+        "This is URGENT — go to a dentist TODAY, same day.",
+        "Do NOT probe, touch, or rinse the exposed centre.",
+        "Give pain relief (paracetamol or ibuprofen, age-appropriate dose).",
+        "Save any broken piece in milk if found.",
+        "Every hour of delay makes treatment harder — do not wait until tomorrow.",
+      ],
+      splinting: "Not required (unless concurrent luxation injury)",
+      followUp: [
+        "6–8 weeks — pulp vitality; periapical radiograph",
+        "6 months — clinical & radiographic review",
+        "1 year — final pulp and root status assessment",
+      ],
+      prognosis: "Good with appropriate and timely pulp management. Immature teeth with partial pulpotomy (MTA/Biodentine): excellent prognosis with continued root development.",
+    },
+
+    root_fracture: {
+      label: "Root Fracture", icon: "📐", severity: "moderate",
+      description: "Fracture involving cementum, dentine, and pulp. Location (cervical/middle/apical) determines management.",
+      immediateActions: [
+        "Periapical radiograph (and angled views) to localise fracture level.",
+        "Administer local anaesthesia if coronal fragment is displaced.",
+        "Reposition displaced coronal fragment gently with digital pressure.",
+        "Confirm position radiographically.",
+        "CERVICAL THIRD fracture: Apply semi-rigid splint for 4 months.",
+        "MIDDLE or APICAL THIRD fracture: Apply flexible splint for 4 weeks.",
+        "Chlorhexidine 0.1% mouthrinse × 2/day for 1–2 weeks.",
+        "Soft diet for 4 weeks.",
+        "Monitor coronal fragment pulp vitality — RCT of coronal fragment only if necrosis confirmed.",
+      ],
+      parentActions: [
+        "The tooth may look slightly tilted or be mobile near the gum line — the root may be cracked.",
+        "Do NOT try to remove or reposition the tooth.",
+        "Go to a dentist TODAY — same day.",
+        "Avoid any pressure on that tooth: do not chew on that side.",
+        "Give pain relief as needed (paracetamol or ibuprofen).",
+      ],
+      splinting: "Cervical ⅓: Semi-rigid splint — 4 months | Middle & apical ⅓: Flexible splint — 4 weeks",
+      followUp: [
+        "4 weeks — splint check (middle/apical: remove); pulp sensitivity",
+        "6–8 weeks — clinical & radiographic review",
+        "4 months — splint removal (cervical); radiographic healing assessment",
+        "6 months — radiographic review",
+        "1 year — final clinical & radiographic assessment",
+      ],
+      prognosis: "Favorable if fragments remain in contact and immobilised. Cervical ⅓ fractures carry the poorest prognosis.",
+    },
+
+    alveolar_fracture: {
+      label: "Alveolar Fracture", icon: "🦴", severity: "high",
+      description: "Fracture of the alveolar bone, often involving multiple teeth as a unit. Teeth may be displaced together with bone segment.",
+      immediateActions: [
+        "Periapical + occlusal radiographs (and CBCT if available) to assess extent of fracture.",
+        "Administer local anaesthesia.",
+        "Reposition displaced teeth AND alveolar bone segment TOGETHER as one unit.",
+        "Apply semi-rigid splint spanning all involved and at least one stable tooth on each side — 4 weeks.",
+        "Suture mucosal lacerations if present.",
+        "Soft diet for 4 weeks.",
+        "Chlorhexidine 0.1% mouthrinse × 2/day for 1–2 weeks.",
+        "Monitor pulp vitality of ALL involved teeth — RCT for those that develop necrosis.",
+        "Tetanus prophylaxis if indicated.",
+        "Refer for maxillofacial consult if fracture is extensive.",
+      ],
+      parentActions: [
+        "Several teeth may be displaced together, or there is visible swelling and a gap in the jaw — this is a dental emergency.",
+        "Go to a dentist or hospital emergency room IMMEDIATELY.",
+        "Do NOT try to reposition any teeth.",
+        "Apply gentle pressure with a clean cloth to any bleeding areas.",
+        "If the child lost consciousness, was vomiting, or has severe headache — go to the emergency room now.",
+        "Do not give anything to eat or drink until assessed.",
+      ],
+      splinting: "Semi-rigid splint across all involved teeth + at least one stable tooth each side — 4 weeks",
+      followUp: [
+        "1 week — splint check; mucosal healing",
+        "4 weeks — splint removal; radiographic review",
+        "6–8 weeks — pulp status of all involved teeth",
+        "6 months — radiographic review",
+        "1 year — final clinical & radiographic assessment",
+      ],
+      prognosis: "Generally good if promptly and accurately repositioned. Pulp necrosis risk is moderate across involved teeth. Root resorption may develop — monitor at every visit.",
+    },
+  },
+
+  primary: {
+    avulsion: {
+      label: "Avulsion", icon: "🦷", severity: "critical",
+      description: "Complete displacement of primary tooth. Replantation is CONTRAINDICATED — risk of damaging permanent successor.",
+      immediateActions: [
+        "DO NOT REPLANT primary teeth — risk of damaging permanent tooth germ.",
+        "Control bleeding: apply gauze with gentle pressure.",
+        "Radiograph to CONFIRM tooth is not intruded (may mimic avulsion).",
+        "Check soft tissues for embedded fragments.",
+        "Discuss space management — space maintainer may be needed.",
+        "Assess need for tetanus prophylaxis.",
+      ],
+      parentActions: [
+        "The baby tooth has come out completely — do NOT try to put it back.",
+        "Press a clean cloth gently on the area to stop bleeding.",
+        "Keep the tooth in a small bag or cup of water to show the dentist.",
+        "See a dentist soon (same day or next day) to check the gum and the adult tooth underneath.",
+        "This is NOT a dental emergency — but do follow up within 24 hours.",
+      ],
+      splinting: "Not applicable — replantation is contraindicated",
+      followUp: [
+        "1–2 weeks — healing check; oral hygiene review",
+        "6–8 weeks — socket healing assessment",
+        "1 year — monitor permanent successor for eruption and developmental disturbances",
+        "Yearly until permanent tooth erupts — check for enamel defects, dilaceration, or delayed eruption",
+      ],
+      prognosis: "Good for soft tissue healing. Risk of disturbance to permanent successor (enamel hypoplasia, dilaceration, delayed eruption) is ~20–40% depending on child's age and impact severity.",
+    },
+
+    concussion: {
+      label: "Concussion", icon: "💥", severity: "low",
+      description: "Tender to touch/percussion. No displacement or mobility. Common in toddlers.",
+      immediateActions: [
+        "No active treatment usually required.",
+        "Radiograph to exclude subtle displacement or root fracture.",
+        "Soft diet for 1–2 weeks.",
+        "Oral hygiene instructions to parent — gentle brushing with soft brush.",
+        "Chlorhexidine 0.1% applied with cotton bud if brushing is difficult.",
+        "Reassure parent: excellent prognosis.",
+      ],
+      parentActions: [
+        "The baby tooth is sore but in its normal position — no action needed right now.",
+        "Give soft foods for 1–2 weeks.",
+        "Brush gently around the tooth with a soft brush.",
+        "See a dentist within a few days for a check-up.",
+        "If the tooth turns grey or a pimple appears on the gum, see a dentist sooner.",
+      ],
+      splinting: "Not required",
+      followUp: [
+        "1 week — clinical check",
+        "6–8 weeks — pulp status (observe for colour change, fistula, swelling)",
+        "1 year — check for adverse effects on permanent successor",
+      ],
+      prognosis: "Excellent. Pulp necrosis is rare. Grey discolouration may indicate necrosis — requires clinical correlation.",
+    },
+
+    subluxation: {
+      label: "Subluxation", icon: "〰️", severity: "low",
+      description: "Abnormal loosening without displacement. Sulcular bleeding may be present.",
+      immediateActions: [
+        "Radiograph to exclude displacement or root fracture.",
+        "Usually heals spontaneously — no repositioning needed.",
+        "Soft diet for 1–2 weeks.",
+        "Oral hygiene instructions to parent.",
+        "Chlorhexidine 0.1% gel applied to gingival area if brushing is difficult.",
+      ],
+      parentActions: [
+        "The baby tooth is a bit loose — this usually heals on its own.",
+        "Soft foods only for 2 weeks. No hard biting.",
+        "Brush gently around the tooth.",
+        "See a dentist within 1 week for a check.",
+        "If the tooth gets much looser, turns grey, or a gum pimple appears — call the dentist.",
+      ],
+      splinting: "Not required",
+      followUp: [
+        "1 week — mobility and healing check",
+        "6–8 weeks — pulp status; radiographic review",
+        "1 year — monitor permanent successor",
+      ],
+      prognosis: "Good. Spontaneous healing is typical. Monitor for grey discolouration indicating possible necrosis.",
+    },
+
+    lateral_luxation: {
+      label: "Lateral Luxation", icon: "↔️", severity: "moderate",
+      description: "Displacement laterally or palatally. Proximity to permanent successor germ is the key factor in management.",
+      immediateActions: [
+        "Periapical radiograph to assess displacement direction relative to permanent successor.",
+        "If displaced PALATALLY/LINGUALLY (toward successor): EXTRACT immediately.",
+        "If displaced LABIALLY (away from successor) and occlusion not disturbed: allow spontaneous repositioning.",
+        "If occlusion is disturbed: reposition gently or extract.",
+        "Soft diet for 4 weeks.",
+        "Chlorhexidine 0.1% × 2/day.",
+        "Administer local anaesthesia if repositioning or extraction is needed.",
+      ],
+      parentActions: [
+        "The baby tooth has been pushed sideways.",
+        "See a dentist TODAY — the dentist needs to check if it could affect the adult tooth underneath.",
+        "Do NOT try to push the tooth back yourself.",
+        "Give soft foods only.",
+        "The dentist may need to remove the tooth to protect the permanent one growing underneath.",
+      ],
+      splinting: "Rarely indicated; composite/wire splint only if tooth is very mobile after repositioning",
+      followUp: [
+        "1 week — healing; mobility; occlusion",
+        "3–4 weeks — clinical & radiographic review",
+        "6–8 weeks — pulp status (discolouration, fistula)",
+        "6 months — radiographic review",
+        "1 year — permanent successor monitoring",
+      ],
+      prognosis: "Good if successor germ is not involved. Palatally displaced teeth carry risk of developmental disturbance to permanent tooth.",
+    },
+
+    intrusion: {
+      label: "Intrusion", icon: "⬇️", severity: "high",
+      description: "Axial displacement into alveolar bone. Serious risk of developmental damage to permanent successor. Direction of intrusion is CRITICAL.",
+      immediateActions: [
+        "Periapical radiograph AND occlusal view — assess DIRECTION of intrusion.",
+        "▸ Toward LABIAL bone (away from successor): allow spontaneous re-eruption; monitor every 2–3 weeks.",
+        "▸ Toward PALATAL/LINGUAL (toward successor germ): EXTRACT IMMEDIATELY.",
+        "Do NOT attempt forceful repositioning of primary intruded tooth.",
+        "If re-eruption chosen: soft diet; monitor for signs of necrosis (grey colour, fistula, swelling).",
+        "If necrosis signs develop: extract.",
+        "Inform parent of risk to permanent successor regardless of treatment chosen.",
+      ],
+      parentActions: [
+        "The baby tooth looks shorter than usual or has disappeared into the gum — see a dentist IMMEDIATELY.",
+        "Go to a dentist TODAY — this cannot wait.",
+        "The dentist needs to take an X-ray to check which way the tooth moved.",
+        "Do NOT touch or try to pull the tooth.",
+        "The adult tooth underneath may be affected — prompt treatment is essential.",
+      ],
+      splinting: "Not required",
+      followUp: [
+        "1 week — direction of re-eruption; early signs",
+        "3–4 weeks — confirm re-eruption movement if observed",
+        "6–8 weeks — pulp status; radiographic review",
+        "6 months — successor germ assessment",
+        "1 year — permanent successor eruption and development",
+        "Yearly until permanent tooth erupts — check for enamel hypoplasia, dilaceration",
+      ],
+      prognosis: "Variable. Labially intruded: often re-erupt spontaneously. Palatally displaced: extraction mandatory. Overall successor disturbance rate: 20–70% depending on severity and age.",
+    },
+
+    extrusion: {
+      label: "Extrusion", icon: "⬆️", severity: "moderate",
+      description: "Partial axial displacement out of socket. Risk of aspiration if severely loose.",
+      immediateActions: [
+        "Assess degree of extrusion and mobility.",
+        "If MINOR extrusion (< 3 mm) and tooth is stable: monitor for spontaneous repositioning; soft diet.",
+        "If SEVERE extrusion (> 3 mm) or very mobile (aspiration risk): EXTRACT.",
+        "Periapical radiograph to confirm and exclude root fracture.",
+        "Soft diet for 1–2 weeks.",
+        "Extraction preferred if any doubt about stability — child safety is paramount.",
+      ],
+      parentActions: [
+        "The baby tooth is sticking out further than usual and is very loose.",
+        "If the tooth is hanging by a thread or the child might swallow it: go to a dentist IMMEDIATELY.",
+        "If slightly loose only: soft foods and see a dentist same day.",
+        "Do NOT try to pull it out yourself unless it is completely dangling.",
+        "Child safety is the priority — a swallowed tooth is an aspiration risk.",
+      ],
+      splinting: "Not required",
+      followUp: [
+        "1 week — mobility; spontaneous repositioning check",
+        "6–8 weeks — pulp status; radiographic review",
+        "1 year — successor monitoring if extraction was performed",
+      ],
+      prognosis: "Favorable for minor extrusions monitored conservatively. Extracted teeth: monitor successor for space management.",
+    },
+
+    crown_fracture_uncomplicated: {
+      label: "Crown Fracture (Uncomplicated)", icon: "🔸", severity: "low",
+      description: "Enamel or enamel-dentine fracture WITHOUT pulp exposure.",
+      immediateActions: [
+        "Smooth sharp enamel edges to prevent soft tissue laceration.",
+        "Periapical radiograph to exclude root fracture or displacement.",
+        "If dentine exposed and sensitive: cover with glass ionomer cement (GIC) or composite resin.",
+        "Reattach fragment if available, intact, and child cooperates.",
+        "Oral hygiene instructions to parent.",
+      ],
+      parentActions: [
+        "A piece of the baby tooth has chipped off — no bleeding from the centre of the tooth.",
+        "Check for any sharp edges that may cut the tongue or lip.",
+        "Save the broken piece if you find it.",
+        "See a dentist within 1–2 days — not an emergency.",
+        "Give soft foods and avoid the area when brushing until seen.",
+      ],
+      splinting: "Not required",
+      followUp: [
+        "6–8 weeks — clinical & radiographic review",
+        "1 year — pulp status; successor monitoring",
+      ],
+      prognosis: "Excellent. Restoration longevity depends on cooperation and extent of fracture.",
+    },
+
+    crown_fracture_complicated: {
+      label: "Crown Fracture (Complicated)", icon: "🔴", severity: "high",
+      description: "Crown fracture WITH pulp exposure. Management guided by root resorption, remaining structure, and child cooperation.",
+      immediateActions: [
+        "Periapical radiograph: assess root length, physiological resorption stage, and periapical status.",
+        "Assess child cooperation — behaviour management is critical.",
+        "If root resorption < ⅓, cooperative child, adequate structure: pulpotomy with ZOE, Biodentine or MTA; restore.",
+        "If root resorption > ⅓, uncooperative child, or inadequate structure: EXTRACT.",
+        "Discuss space maintainer with parent if extraction is performed.",
+        "Local anaesthesia required.",
+      ],
+      parentActions: [
+        "The baby tooth broke and there is a pink/red dot or bleeding in the centre — the nerve is exposed.",
+        "See a dentist TODAY — this is urgent.",
+        "Do NOT touch the exposed centre of the tooth.",
+        "Give pain relief (paracetamol or ibuprofen, age-appropriate).",
+        "If the tooth is mostly broken and barely attached, keep the child calm and go straight to the dentist.",
+      ],
+      splinting: "Not required",
+      followUp: [
+        "6–8 weeks — clinical & radiographic review",
+        "6 months — pulp status; root resorption monitoring",
+        "1 year — permanent successor check",
+      ],
+      prognosis: "Variable. Pulpotomy in tooth with minimal resorption: reasonable prognosis. Untreated pulp exposure leads to necrosis and risk of successor disturbance.",
+    },
+  },
+};
+
+/* ═══════════════════════════════════════════════════════════════
+   UTILITIES
+═══════════════════════════════════════════════════════════════ */
+function parseFollowUpDays(text) {
+  const t = text.split('—')[0].trim().toLowerCase();
+  const m = t.match(/(\d+(?:\.\d+)?)\s*(day|week|month|year)/);
+  if (!m) return null;
+  const n = parseFloat(m[1]);
+  if (m[2].startsWith('day'))   return n;
+  if (m[2].startsWith('week'))  return n * 7;
+  if (m[2].startsWith('month')) return n * 30;
+  if (m[2].startsWith('year'))  return n * 365;
+  return null;
+}
+
+function buildICS(injuryLabel, followUpSchedule) {
+  const now = new Date();
+  const stamp = now.toISOString().replace(/[-:.]/g,'').slice(0,15)+'Z';
+  const events = followUpSchedule.map((fu, i) => {
+    const days = parseFollowUpDays(fu);
+    if (!days) return '';
+    const d = new Date(now);
+    d.setDate(d.getDate() + Math.round(days));
+    const dateStr = d.toISOString().split('T')[0].replace(/-/g,'');
+    const uid = `dentosafe-${now.getTime()}-${i}@app`;
+    const desc = fu.replace(/,/g,'\\,').replace(/\n/g,'\\n');
+    return ['BEGIN:VEVENT',`UID:${uid}`,`DTSTAMP:${stamp}`,
+      `DTSTART;VALUE=DATE:${dateStr}`,`DTEND;VALUE=DATE:${dateStr}`,
+      `SUMMARY:DentoSafe – ${injuryLabel} Follow-up`,`DESCRIPTION:${desc}`,
+      'END:VEVENT'].join('\r\n');
+  }).filter(Boolean).join('\r\n');
+  return ['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//DentoSafe//IADT2020//EN',
+    events,'END:VCALENDAR'].join('\r\n');
+}
+
+function downloadICS(content, filename) {
+  const blob = new Blob([content], { type: 'text/calendar;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename; a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   INJURY DIAGRAMS  (improvement #3)
+═══════════════════════════════════════════════════════════════ */
+function InjuryDiagram({ injuryKey }) {
+  const B = "#2563eb"; // blue tooth stroke
+  const S = "#93c5fd"; // socket stroke
+  const F = "#dbeafe"; // socket fill
+  const W = "white";
+  const R = "#dc2626";
+  const A = "#f59e0b";
+
+  const diagrams = {
+    avulsion: (
+      <svg viewBox="0 0 50 68" className="w-12 h-16">
+        {/* empty socket dashed */}
+        <path d={`M4 34 Q2 60 25 63 Q48 60 46 34`} fill="#fee2e2" stroke="#fca5a5" strokeWidth="1.5" strokeDasharray="4,2"/>
+        {/* tooth floating above */}
+        <rect x="10" y="2" width="30" height="20" rx="6" fill={W} stroke={B} strokeWidth="2"/>
+        <path d="M13 22 L11 44 Q14 52 25 52 Q36 52 39 44 L37 22 Z" fill={W} stroke={B} strokeWidth="2"/>
+        <text x="39" y="36" fontSize="14" fill={R} fontWeight="bold">↑</text>
+      </svg>
+    ),
+    concussion: (
+      <svg viewBox="0 0 50 68" className="w-12 h-16">
+        <path d="M4 32 Q2 60 25 63 Q48 60 46 32" fill={F} stroke={S} strokeWidth="1.5"/>
+        <rect x="10" y="2" width="30" height="20" rx="6" fill={W} stroke={B} strokeWidth="2"/>
+        <path d="M13 22 L11 46 Q14 56 25 56 Q36 56 39 46 L37 22 Z" fill={W} stroke={B} strokeWidth="2"/>
+        <text x="1" y="14" fontSize="10" fill={A}>✦</text>
+        <text x="38" y="10" fontSize="8" fill={A}>✦</text>
+      </svg>
+    ),
+    subluxation: (
+      <svg viewBox="0 0 50 68" className="w-12 h-16">
+        <path d="M4 32 Q2 60 25 63 Q48 60 46 32" fill={F} stroke={S} strokeWidth="1.5"/>
+        <g transform="rotate(-6 25 38)">
+          <rect x="10" y="2" width="30" height="20" rx="6" fill={W} stroke={B} strokeWidth="2"/>
+          <path d="M13 22 L11 46 Q14 56 25 56 Q36 56 39 46 L37 22 Z" fill={W} stroke={B} strokeWidth="2"/>
+        </g>
+        <path d="M2 38 Q8 35 14 38" stroke={A} strokeWidth="1.5" fill="none"/>
+        <path d="M2 43 Q8 40 14 43" stroke={A} strokeWidth="1.5" fill="none"/>
+      </svg>
+    ),
+    lateral_luxation: (
+      <svg viewBox="0 0 50 68" className="w-12 h-16">
+        <path d="M4 32 Q2 60 25 63 Q48 60 46 32" fill={F} stroke={S} strokeWidth="1.5" strokeDasharray="3,2"/>
+        <g transform="translate(8,0) rotate(14 25 38)">
+          <rect x="10" y="2" width="30" height="20" rx="6" fill={W} stroke="#ea580c" strokeWidth="2"/>
+          <path d="M13 22 L11 46 Q14 56 25 56 Q36 56 39 46 L37 22 Z" fill={W} stroke="#ea580c" strokeWidth="2"/>
+        </g>
+        <text x="0" y="26" fontSize="14" fill="#ea580c">→</text>
+      </svg>
+    ),
+    intrusion: (
+      <svg viewBox="0 0 50 68" className="w-12 h-16">
+        <path d="M4 30 Q2 58 25 61 Q48 58 46 30" fill={F} stroke={S} strokeWidth="1.5"/>
+        <rect x="10" y="24" width="30" height="14" rx="6" fill={W} stroke={R} strokeWidth="2"/>
+        <path d="M13 38 L11 54 Q14 62 25 62 Q36 62 39 54 L37 38 Z" fill={F} stroke={R} strokeWidth="2"/>
+        <text x="20" y="18" fontSize="14" fill={R} fontWeight="bold">↓</text>
+      </svg>
+    ),
+    extrusion: (
+      <svg viewBox="0 0 50 68" className="w-12 h-16">
+        <path d="M4 36 Q2 62 25 65 Q48 62 46 36" fill={F} stroke={S} strokeWidth="1.5" strokeDasharray="3,2"/>
+        <rect x="10" y="2" width="30" height="20" rx="6" fill={W} stroke={A} strokeWidth="2"/>
+        <path d="M13 22 L11 46 Q14 56 25 56 Q36 56 39 46 L37 22 Z" fill={W} stroke={A} strokeWidth="2"/>
+        <text x="20" y="67" fontSize="12" fill="#d97706">↑</text>
+      </svg>
+    ),
+    crown_fracture_uncomplicated: (
+      <svg viewBox="0 0 50 68" className="w-12 h-16">
+        <path d="M4 32 Q2 60 25 63 Q48 60 46 32" fill={F} stroke={S} strokeWidth="1.5"/>
+        <rect x="10" y="2" width="30" height="20" rx="6" fill={W} stroke={B} strokeWidth="2"/>
+        <path d="M13 22 L11 46 Q14 56 25 56 Q36 56 39 46 L37 22 Z" fill={W} stroke={B} strokeWidth="2"/>
+        <line x1="30" y1="2" x2="23" y2="22" stroke="#64748b" strokeWidth="2" strokeDasharray="2,1"/>
+        <path d="M30 2 L40 12 L23 22 Z" fill="#e2e8f0" opacity="0.9"/>
+      </svg>
+    ),
+    crown_fracture_complicated: (
+      <svg viewBox="0 0 50 68" className="w-12 h-16">
+        <path d="M4 32 Q2 60 25 63 Q48 60 46 32" fill={F} stroke={S} strokeWidth="1.5"/>
+        <rect x="10" y="2" width="30" height="20" rx="6" fill={W} stroke={B} strokeWidth="2"/>
+        <path d="M13 22 L11 46 Q14 56 25 56 Q36 56 39 46 L37 22 Z" fill={W} stroke={B} strokeWidth="2"/>
+        <line x1="30" y1="2" x2="23" y2="22" stroke={R} strokeWidth="2"/>
+        <path d="M30 2 L40 12 L23 22 Z" fill="#fecaca" opacity="0.9"/>
+        <circle cx="24" cy="21" r="3.5" fill={R}/>
+      </svg>
+    ),
+    root_fracture: (
+      <svg viewBox="0 0 50 68" className="w-12 h-16">
+        <path d="M4 32 Q2 60 25 63 Q48 60 46 32" fill={F} stroke={S} strokeWidth="1.5"/>
+        <rect x="10" y="2" width="30" height="20" rx="6" fill={W} stroke={B} strokeWidth="2"/>
+        <path d="M13 22 L11 46 Q14 56 25 56 Q36 56 39 46 L37 22 Z" fill={W} stroke={B} strokeWidth="2"/>
+        <line x1="8" y1="36" x2="42" y2="30" stroke={R} strokeWidth="2.5" strokeDasharray="3,1"/>
+      </svg>
+    ),
+    alveolar_fracture: (
+      <svg viewBox="0 0 58 68" className="w-14 h-16">
+        <path d="M2 30 Q0 60 29 63 Q58 60 56 30" fill={F} stroke={S} strokeWidth="1.5"/>
+        <rect x="2" y="3" width="24" height="18" rx="5" fill={W} stroke={B} strokeWidth="1.5"/>
+        <path d="M4 21 L2 44 Q5 52 14 52 Q23 52 26 44 L24 21 Z" fill={W} stroke={B} strokeWidth="1.5"/>
+        <rect x="32" y="3" width="24" height="18" rx="5" fill={W} stroke={B} strokeWidth="1.5"/>
+        <path d="M34 21 L32 44 Q35 52 44 52 Q53 52 56 44 L54 21 Z" fill={W} stroke={B} strokeWidth="1.5"/>
+        <line x1="0" y1="34" x2="58" y2="28" stroke={R} strokeWidth="2.5" strokeDasharray="4,2"/>
+      </svg>
+    ),
+  };
+  return diagrams[injuryKey] || null;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   SEVERITY CONFIG
+═══════════════════════════════════════════════════════════════ */
+const severityConfig = {
+  critical: { label:"Critical",  bg:"bg-red-100",    text:"text-red-700",    border:"border-red-300",   dot:"bg-red-500"    },
+  high:     { label:"Urgent",    bg:"bg-orange-100", text:"text-orange-700", border:"border-orange-300",dot:"bg-orange-500"  },
+  moderate: { label:"Moderate",  bg:"bg-yellow-100", text:"text-yellow-700", border:"border-yellow-300",dot:"bg-yellow-500"  },
+  low:      { label:"Routine",   bg:"bg-green-100",  text:"text-green-700",  border:"border-green-300", dot:"bg-green-500"   },
+};
+
+function SeverityBadge({ severity }) {
+  const cfg = severityConfig[severity] || severityConfig.low;
+  return (
+    <span className={`badge gap-1.5 ${cfg.bg} ${cfg.text}`}>
+      <span className={`inline-block w-1.5 h-1.5 rounded-full ${cfg.dot}`}></span>
+      {cfg.label}
+    </span>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   AVULSION TIMER  (improvement #2)
+═══════════════════════════════════════════════════════════════ */
+function AvulsionTimer() {
+  const [elapsed, setElapsed] = React.useState(0);
+  const start = React.useRef(Date.now());
+
+  React.useEffect(() => {
+    const id = setInterval(() => setElapsed(Math.floor((Date.now() - start.current) / 1000)), 1000);
+    return () => clearInterval(id);
+  }, []);
+
+  const mins = Math.floor(elapsed / 60);
+  const secs = elapsed % 60;
+  const isDanger  = mins >= 60;
+  const isWarning = mins >= 30 && !isDanger;
+
+  const colors = isDanger  ? 'bg-red-50 border-red-400 text-red-800' :
+                 isWarning ? 'bg-amber-50 border-amber-400 text-amber-800' :
+                             'bg-green-50 border-green-400 text-green-800';
+  const msg = isDanger  ? '⚠ Over 60 min — PDL cells likely non-viable. Use the Dry >60 min protocol.' :
+              isWarning ? '⚠ Approaching the 60-minute limit — act as fast as possible.' :
+                          '✓ Within the 60-minute window — replant now for the best outcome.';
+
+  return (
+    <div className={`rounded-xl border-2 p-4 mb-4 ${colors}`}>
+      <div className="text-xs font-bold uppercase tracking-wider mb-1">⏱ Time since app opened</div>
+      <div className="text-4xl font-bold font-mono tracking-widest">
+        {String(mins).padStart(2,'0')}:{String(secs).padStart(2,'0')}
+      </div>
+      <p className="text-sm mt-1 font-medium">{msg}</p>
+      <p className="text-xs mt-1 opacity-60">Note: actual extra-oral time may be longer than this timer.</p>
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   EMERGENCY BANNER
+═══════════════════════════════════════════════════════════════ */
+function EmergencyBanner({ onQuickAvulsion, mode }) {
+  const text = mode === 'parent'
+    ? 'Tooth knocked out? Pick up by the crown — put it back or store in milk — go to dentist NOW'
+    : 'Avulsion Emergency: Handle tooth by crown only — replant within 60 min';
+  return (
+    <div className="bg-red-600 text-white px-4 py-2.5 flex items-center justify-between sticky top-0 z-50 shadow-lg no-print">
+      <div className="flex items-center gap-2 text-sm font-medium">
+        <span className="text-lg">🚨</span>
+        <span className="hidden sm:inline">{text}</span>
+        <span className="sm:hidden">Tooth knocked out? Act now.</span>
+      </div>
+      <button
+        onClick={onQuickAvulsion}
+        className="emergency-pulse bg-white text-red-600 font-bold text-xs px-4 py-1.5 rounded-full hover:bg-red-50 transition-colors whitespace-nowrap ml-4"
+      >
+        {mode === 'parent' ? 'WHAT TO DO →' : 'AVULSION PROTOCOL →'}
+      </button>
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   MODE SELECT SCREEN  (improvement #1)
+═══════════════════════════════════════════════════════════════ */
+function ModeSelectScreen({ onSelect }) {
+  return (
+    <div className="min-h-screen flex flex-col items-center justify-center px-4 py-10 bg-gradient-to-br from-medical-50 to-blue-100 fade-in">
+      <div className="mb-8 text-center">
+        <div className="w-16 h-16 rounded-2xl bg-medical-600 flex items-center justify-center text-white text-3xl shadow-xl mx-auto mb-4">🦷</div>
+        <h1 className="text-3xl font-extrabold text-medical-900 tracking-tight">DentoSafe</h1>
+        <p className="text-medical-500 text-sm mt-1 font-medium">IADT 2020 Dental Trauma Guidelines</p>
+      </div>
+
+      <p className="text-medical-700 font-semibold text-lg mb-6 text-center">Who are you?</p>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 w-full max-w-2xl">
+        {/* Dentist card */}
+        <button
+          onClick={() => onSelect('dentist')}
+          className="card-hover bg-white rounded-2xl border-2 border-medical-200 p-7 text-left shadow hover:border-medical-500 hover:shadow-xl transition-all"
+        >
+          <div className="text-4xl mb-4">👨‍⚕️</div>
+          <div className="text-xl font-bold text-medical-900 mb-1">Dentist / Clinician</div>
+          <p className="text-sm text-medical-500 leading-relaxed">
+            Full clinical protocols, IADT 2020 treatment steps, splinting details, follow-up schedules, prognosis, and calendar export.
+          </p>
+          <div className="mt-4 inline-flex items-center gap-1.5 text-xs font-semibold text-medical-600 bg-medical-100 px-3 py-1.5 rounded-full">
+            Clinical mode →
+          </div>
+        </button>
+
+        {/* Parent card */}
+        <button
+          onClick={() => onSelect('parent')}
+          className="card-hover bg-white rounded-2xl border-2 border-amber-200 p-7 text-left shadow hover:border-amber-400 hover:shadow-xl transition-all"
+        >
+          <div className="text-4xl mb-4">👨‍👩‍👧</div>
+          <div className="text-xl font-bold text-gray-900 mb-1">Parent / First Responder</div>
+          <p className="text-sm text-gray-500 leading-relaxed">
+            Clear, plain-language first-aid steps — what to do right now, and when to get to a dentist.
+          </p>
+          <div className="mt-4 inline-flex items-center gap-1.5 text-xs font-semibold text-amber-700 bg-amber-100 px-3 py-1.5 rounded-full">
+            First aid mode →
+          </div>
+        </button>
+      </div>
+
+      <p className="mt-8 text-xs text-medical-400 text-center">For clinical reference — always apply professional judgment</p>
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   HEADER
+═══════════════════════════════════════════════════════════════ */
+function Header({ mode, onResetMode }) {
+  const modeLabel = mode === 'parent' ? '👨‍👩‍👧 Parent Mode' : '👨‍⚕️ Clinician Mode';
+  const modeBg    = mode === 'parent' ? 'bg-amber-100 text-amber-700' : 'bg-medical-100 text-medical-700';
+  return (
+    <header className="bg-white border-b border-medical-100 px-4 sm:px-6 py-3 flex items-center gap-3 no-print">
+      <div className="w-9 h-9 rounded-xl bg-medical-600 flex items-center justify-center text-white text-lg shadow-md">🦷</div>
+      <div>
+        <h1 className="text-lg font-extrabold text-medical-900 leading-tight">DentoSafe</h1>
+        <p className="text-xs text-medical-400 font-medium">IADT 2020 Guidelines</p>
+      </div>
+      {mode && (
+        <div className="ml-auto flex items-center gap-2">
+          <span className={`text-xs font-semibold px-3 py-1 rounded-full ${modeBg}`}>{modeLabel}</span>
+          <button
+            onClick={onResetMode}
+            className="text-xs text-medical-400 hover:text-medical-600 px-2 py-1 rounded-lg hover:bg-medical-50"
+            title="Switch mode"
+          >
+            ⇄ Switch
+          </button>
+        </div>
+      )}
+    </header>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   TOOTH TYPE CARD
+═══════════════════════════════════════════════════════════════ */
+function ToothTypeCard({ type, label, subtitle, icon, selected, onClick }) {
+  return (
+    <button
+      onClick={onClick}
+      className={`card-hover w-full rounded-2xl border-2 p-5 text-left transition-all ${
+        selected ? 'border-medical-500 bg-medical-600 text-white shadow-lg' : 'border-medical-200 bg-white text-medical-800 hover:border-medical-400'
+      }`}
+    >
+      <div className="text-3xl mb-2">{icon}</div>
+      <div className="font-bold text-base mb-0.5">{label}</div>
+      <div className={`text-xs ${selected ? 'text-medical-200' : 'text-medical-400'}`}>{subtitle}</div>
+    </button>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   INJURY CARD  (with diagram — improvement #3)
+═══════════════════════════════════════════════════════════════ */
+function InjuryCard({ injury, injuryKey, onClick }) {
+  const cfg = severityConfig[injury.severity] || severityConfig.low;
+  return (
+    <button
+      onClick={onClick}
+      className={`card-hover w-full rounded-xl border-2 ${cfg.border} bg-white p-4 text-left flex items-center gap-3 group`}
+    >
+      <div className="flex-shrink-0">
+        <InjuryDiagram injuryKey={injuryKey} />
+      </div>
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center gap-2 flex-wrap mb-1">
+          <span className="font-semibold text-medical-900 text-sm">{injury.label}</span>
+          <SeverityBadge severity={injury.severity} />
+        </div>
+        <p className="text-xs text-medical-500 leading-relaxed line-clamp-2">{injury.description}</p>
+      </div>
+      <span className="text-medical-300 group-hover:text-medical-500 text-lg flex-shrink-0">›</span>
+    </button>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   PARENT PROTOCOL PANEL  (improvement #1 + #2)
+═══════════════════════════════════════════════════════════════ */
+function ParentProtocolPanel({ injury, injuryKey, onBack }) {
+  const cfg = severityConfig[injury.severity] || severityConfig.low;
+  const isAvulsion = !!injury.extraoralTime;
+  const urgencyMap = {
+    critical: { label: "GO NOW", color: "bg-red-600 text-white", sub: "Dental emergency — go immediately" },
+    high:     { label: "TODAY",  color: "bg-orange-500 text-white", sub: "Same day — see a dentist today" },
+    moderate: { label: "SOON",   color: "bg-yellow-400 text-white", sub: "Within 24–48 hours" },
+    low:      { label: "1–2 DAYS", color: "bg-green-500 text-white", sub: "Within the next couple of days" },
+  };
+  const urgency = urgencyMap[injury.severity] || urgencyMap.low;
+
+  return (
+    <div className="fade-in bg-white rounded-2xl border border-medical-100 shadow-sm overflow-hidden print-card">
+      <div className={`px-5 py-4 ${cfg.bg} border-b ${cfg.border}`}>
+        <button onClick={onBack} className={`text-sm font-semibold ${cfg.text} bg-white bg-opacity-60 hover:bg-opacity-90 mb-4 flex items-center gap-2 px-4 py-2 rounded-xl border border-current border-opacity-20 hover:border-opacity-40 transition-all no-print`}>
+          ‹ Back
+        </button>
+        <div className="flex items-center gap-4">
+          <InjuryDiagram injuryKey={injuryKey} />
+          <div>
+            <div className="flex items-center gap-2 mb-1 flex-wrap">
+              <h2 className="text-xl font-bold text-medical-900">{injury.label}</h2>
+              <SeverityBadge severity={injury.severity} />
+            </div>
+            <p className="text-sm text-medical-600">{injury.description}</p>
+          </div>
+        </div>
+      </div>
+
+      <div className="p-5 space-y-5">
+        {/* When to see a dentist */}
+        <div className={`rounded-xl p-4 ${urgency.color} flex items-center gap-3`}>
+          <span className="text-2xl">🏥</span>
+          <div>
+            <div className="font-extrabold text-lg tracking-wide">{urgency.label}</div>
+            <div className="text-sm opacity-90">{urgency.sub}</div>
+          </div>
+        </div>
+
+        {/* Avulsion timer */}
+        {isAvulsion && <AvulsionTimer />}
+
+        {/* What to do right now */}
+        <div>
+          <h3 className="text-sm font-bold text-gray-700 mb-3 uppercase tracking-wider">What to do right now</h3>
+          <ol className="space-y-3">
+            {(injury.parentActions || injury.immediateActions).map((action, i) => (
+              <li key={i} className="flex gap-3">
+                <span className="flex-shrink-0 w-7 h-7 rounded-full bg-amber-500 text-white text-sm flex items-center justify-center font-bold">{i+1}</span>
+                <span className="pt-0.5 text-gray-800 text-sm leading-relaxed">{action}</span>
+              </li>
+            ))}
+          </ol>
+        </div>
+
+        {/* Primary avulsion: do NOT replant notice */}
+        {injuryKey === 'avulsion' && (
+          <div className="rounded-xl bg-red-50 border border-red-200 p-4">
+            <p className="text-sm font-bold text-red-700">⚠ For baby teeth only: do NOT put the tooth back</p>
+            <p className="text-xs text-red-600 mt-1">Replanting a baby tooth can damage the permanent adult tooth growing underneath.</p>
+          </div>
+        )}
+
+        {/* Disclaimer */}
+        <p className="text-xs text-gray-400 text-center pt-2">
+          This is first-aid guidance only. Always seek professional dental care.
+        </p>
+      </div>
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   CLINICAL PROTOCOL PANEL  (dentist mode — improvement #4 + #5)
+═══════════════════════════════════════════════════════════════ */
+function ProtocolPanel({ injury, injuryKey, onBack }) {
+  const [tab, setTab] = React.useState('treatment');
+  const cfg = severityConfig[injury.severity] || severityConfig.low;
+  const isAvulsion = !!injury.extraoralTime;
+
+  const handlePrint = () => window.print();
+
+  const handleICS = () => {
+    const ics = buildICS(injury.label, injury.followUp);
+    downloadICS(ics, `DentoSafe_${injuryKey}_followup.ics`);
+  };
+
+  return (
+    <div className="fade-in bg-white rounded-2xl border border-medical-100 shadow-sm overflow-hidden print-card">
+      {/* Header */}
+      <div className={`px-5 py-4 ${cfg.bg} border-b ${cfg.border}`}>
+        <div className="flex items-center justify-between mb-3 no-print">
+          <button onClick={onBack} className={`text-sm font-semibold ${cfg.text} bg-white bg-opacity-60 hover:bg-opacity-90 flex items-center gap-2 px-4 py-2 rounded-xl border border-current border-opacity-20 hover:border-opacity-40 transition-all`}>
+            ‹ Back to injury list
+          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={handleICS}
+              title="Export follow-up schedule as calendar (.ics)"
+              className="text-xs bg-white text-medical-600 border border-medical-200 px-3 py-1.5 rounded-lg hover:bg-medical-50 flex items-center gap-1 font-medium"
+            >
+              📅 Export Calendar
+            </button>
+            <button
+              onClick={handlePrint}
+              title="Print this protocol"
+              className="text-xs bg-white text-medical-600 border border-medical-200 px-3 py-1.5 rounded-lg hover:bg-medical-50 flex items-center gap-1 font-medium"
+            >
+              🖨 Print
+            </button>
+          </div>
+        </div>
+
+        <div className="flex items-start gap-4">
+          <InjuryDiagram injuryKey={injuryKey} />
+          <div>
+            <div className="flex items-center gap-2 mb-1 flex-wrap">
+              <h2 className="text-xl font-bold text-medical-900">{injury.label}</h2>
+              <SeverityBadge severity={injury.severity} />
+            </div>
+            <p className="text-sm text-medical-600">{injury.description}</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Tabs */}
+      <div className="flex border-b border-medical-100 bg-medical-50 px-4 no-print">
+        {['treatment','splinting','followup'].map(t => (
+          <button
+            key={t}
+            onClick={() => setTab(t)}
+            className={`px-4 py-3 text-xs font-semibold capitalize tracking-wide border-b-2 transition-colors ${
+              tab === t ? 'border-medical-500 text-medical-700' : 'border-transparent text-medical-400 hover:text-medical-600'
+            }`}
+          >
+            {t === 'followup' ? 'Follow-up' : t.charAt(0).toUpperCase() + t.slice(1)}
+          </button>
+        ))}
+      </div>
+
+      <div className="p-5">
+
+        {/* TREATMENT TAB */}
+        {tab === 'treatment' && (
+          <div className="fade-in">
+            <h3 className="text-xs font-semibold text-medical-700 mb-3 uppercase tracking-wider">Immediate Actions</h3>
+            <ol className="space-y-2">
+              {injury.immediateActions.map((action, i) => (
+                <li key={i} className="flex gap-3 text-sm text-medical-800">
+                  <span className="flex-shrink-0 w-6 h-6 rounded-full bg-medical-600 text-white text-xs flex items-center justify-center font-bold">{i+1}</span>
+                  <span className="pt-0.5 leading-relaxed">{action}</span>
+                </li>
+              ))}
+            </ol>
+
+            {isAvulsion && (
+              <div className="mt-6">
+                <h3 className="text-xs font-semibold text-medical-700 mb-3 uppercase tracking-wider">Extra-oral Time Protocols</h3>
+                <div className="grid gap-3">
+                  {Object.values(injury.extraoralTime).map((scenario, i) => (
+                    <div key={i} className="rounded-xl border border-medical-200 p-4">
+                      <div className="font-semibold text-medical-800 text-sm mb-2">{scenario.label}</div>
+                      <ul className="space-y-1">
+                        {scenario.protocol.map((step, j) => (
+                          <li key={j} className="text-xs text-medical-600 flex gap-2">
+                            <span className="text-medical-400 flex-shrink-0">•</span>{step}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {injury.prognosis && (
+              <div className="mt-5 p-4 rounded-xl bg-medical-50 border border-medical-100">
+                <div className="text-xs font-semibold text-medical-600 mb-1 uppercase tracking-wider">Prognosis</div>
+                <p className="text-sm text-medical-800">{injury.prognosis}</p>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* SPLINTING TAB */}
+        {tab === 'splinting' && (
+          <div className="fade-in">
+            <h3 className="text-xs font-semibold text-medical-700 mb-3 uppercase tracking-wider">Splinting Protocol</h3>
+            <div className="p-4 rounded-xl bg-medical-50 border border-medical-200 text-sm text-medical-800">
+              {injury.splinting}
+            </div>
+            <div className="mt-4 p-4 rounded-xl bg-yellow-50 border border-yellow-200">
+              <div className="text-xs font-semibold text-yellow-700 mb-1">Note</div>
+              <p className="text-xs text-yellow-700">Always use flexible (physiological) splinting unless otherwise specified. Rigid splinting is contraindicated in most cases except cervical root fractures and alveolar fractures.</p>
+            </div>
+          </div>
+        )}
+
+        {/* FOLLOW-UP TAB */}
+        {tab === 'followup' && (
+          <div className="fade-in">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-xs font-semibold text-medical-700 uppercase tracking-wider">Follow-up Schedule</h3>
+              <button
+                onClick={handleICS}
+                className="no-print text-xs bg-medical-600 text-white px-3 py-1.5 rounded-lg hover:bg-medical-700 flex items-center gap-1 font-medium"
+              >
+                📅 Add to Calendar
+              </button>
+            </div>
+            <div className="space-y-2">
+              {injury.followUp.map((fu, i) => (
+                <div key={i} className="flex items-start gap-2.5 px-3 py-2 rounded-lg bg-medical-50 border border-medical-100">
+                  <span className="w-5 h-5 rounded-full bg-medical-500 text-white text-xs flex items-center justify-center font-bold flex-shrink-0 mt-0.5">{i+1}</span>
+                  <span className="text-xs text-medical-700 leading-relaxed">{fu}</span>
+                </div>
+              ))}
+            </div>
+            <div className="mt-4 p-4 rounded-xl border border-medical-100 bg-medical-50">
+              <div className="text-xs font-semibold text-medical-600 mb-2 uppercase tracking-wider">At each visit, assess:</div>
+              <ul className="space-y-1 text-xs text-medical-700">
+                <li className="flex gap-2"><span>•</span>Pulp vitality (EPT / thermal testing)</li>
+                <li className="flex gap-2"><span>•</span>Periapical radiograph</li>
+                <li className="flex gap-2"><span>•</span>Signs of root resorption or periapical infection</li>
+                <li className="flex gap-2"><span>•</span>Mobility and percussion response</li>
+                <li className="flex gap-2"><span>•</span>Patient symptoms / discolouration</li>
+              </ul>
+            </div>
+          </div>
+        )}
+
+      </div>
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   MAIN APP
+═══════════════════════════════════════════════════════════════ */
+function App() {
+  const [userMode, setUserMode]         = React.useState(null);       // 'dentist' | 'parent'
+  const [toothType, setToothType]       = React.useState(null);       // 'permanent' | 'primary'
+  const [selectedInjury, setSelectedInjury] = React.useState(null);
+
+  const handleQuickAvulsion = () => {
+    setToothType('permanent');
+    setSelectedInjury('avulsion');
+  };
+
+  const handleResetMode = () => {
+    setUserMode(null);
+    setToothType(null);
+    setSelectedInjury(null);
+  };
+
+  const injuries = toothType ? clinicalData[toothType] : {};
+  const isParent = userMode === 'parent';
+
+  if (!userMode) {
+    return <ModeSelectScreen onSelect={setUserMode} />;
+  }
+
+  return (
+    <div className="min-h-screen flex flex-col">
+      <EmergencyBanner onQuickAvulsion={handleQuickAvulsion} mode={userMode} />
+      <Header mode={userMode} onResetMode={handleResetMode} />
+
+      <main className="flex-1 max-w-3xl mx-auto w-full px-4 py-6 space-y-6">
+
+        {/* Step 1 — Tooth Type */}
+        {!selectedInjury && (
+          <section>
+            <div className="flex items-center gap-2 mb-3 no-print">
+              <span className="w-6 h-6 rounded-full bg-medical-600 text-white text-xs flex items-center justify-center font-bold">1</span>
+              <h2 className="font-semibold text-medical-800">Select Tooth Type</h2>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <ToothTypeCard type="permanent" label="Permanent" subtitle="Age 6+ · Adult dentition" icon="🦷"
+                selected={toothType === 'permanent'} onClick={() => { setToothType('permanent'); setSelectedInjury(null); }} />
+              <ToothTypeCard type="primary" label="Primary" subtitle="Age 0–6 · Baby teeth" icon="🐣"
+                selected={toothType === 'primary'} onClick={() => { setToothType('primary'); setSelectedInjury(null); }} />
+            </div>
+          </section>
+        )}
+
+        {/* Step 2 — Injury Type */}
+        {toothType && !selectedInjury && (
+          <section className="fade-in">
+            <div className="flex items-center gap-2 mb-3 no-print">
+              <span className="w-6 h-6 rounded-full bg-medical-600 text-white text-xs flex items-center justify-center font-bold">2</span>
+              <h2 className="font-semibold text-medical-800">Select Injury Type</h2>
+            </div>
+            <div className="space-y-2">
+              {Object.entries(injuries).map(([key, injury]) => (
+                <InjuryCard key={key} injury={injury} injuryKey={key} onClick={() => setSelectedInjury(key)} />
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* Step 3 — Protocol */}
+        {toothType && selectedInjury && (
+          <section className="fade-in">
+            <div className="flex items-center gap-2 mb-3 no-print">
+              <span className="w-6 h-6 rounded-full bg-medical-600 text-white text-xs flex items-center justify-center font-bold">3</span>
+              <h2 className="font-semibold text-medical-800">
+                {isParent ? 'What To Do' : 'Clinical Protocol'}
+              </h2>
+            </div>
+            {isParent
+              ? <ParentProtocolPanel injury={injuries[selectedInjury]} injuryKey={selectedInjury} onBack={() => setSelectedInjury(null)} />
+              : <ProtocolPanel       injury={injuries[selectedInjury]} injuryKey={selectedInjury} onBack={() => setSelectedInjury(null)} />
+            }
+          </section>
+        )}
+
+        {/* Empty state */}
+        {!toothType && (
+          <div className="text-center py-12 text-medical-400">
+            <div className="text-5xl mb-4">🦷</div>
+            <p className="text-sm">Select a tooth type above to begin.</p>
+            <p className="text-xs mt-1 text-medical-300">Powered by IADT 2020 Clinical Guidelines</p>
+          </div>
+        )}
+
+      </main>
+
+      <footer className="text-center py-4 text-xs text-medical-300 border-t border-medical-100 bg-white no-print">
+        DentoSafe · IADT 2020 · For clinical reference only — always apply professional judgment
+      </footer>
+    </div>
+  );
+}
+
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(<App />);
+</script>
+</body>
+</html>
